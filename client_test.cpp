@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 
     // setup connection
     int port_num = 5000;
-    const char *server_ip_str="::1"; //IPV6 ADDRESS!!
+    const char *server_ip_str="::1"; //A IPV6 ADDRESS REACHABLE = ipv6addr%your_net_device = xxxx::xxxx:xxxx:xxx:xxxx%ethx
 
     int sockfd;
     struct sockaddr_in6 addr;
