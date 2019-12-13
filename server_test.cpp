@@ -43,7 +43,6 @@ int main(int argc, char** argv)
     /* ---main task process--- */
     Mat frame;
     VideoCapture cap;
-    #define BUF_SIZE 655350
     vector<unsigned char> inImage(BUF_SIZE);  
     /* open camera */
     cap.open(0);
