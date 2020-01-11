@@ -12,7 +12,8 @@
 #include <opencv2/videoio.hpp>
 #include <unistd.h>
 #include <iostream>
-
+#include <errno.h>
+#include <net/if.h>
 using namespace std;
 using namespace cv;
 
@@ -24,16 +25,36 @@ int main(int argc, char** argv)
 
     // setup connection
     int port_num = 5000;
-    const char *server_ip_str="::1"; //A IPV6 ADDRESS REACHABLE = ipv6addr%your_net_device = xxxx::xxxx:xxxx:xxx:xxxx%ethx
-
+    char server_ip_str[1000]; 
+    char via_netif[1000];
+    printf("please enter IPv6 addr: \n");
+    scanf("%s", server_ip_str);
     int sockfd;
     struct sockaddr_in6 addr;
 
     sockfd = socket(AF_INET6, SOCK_STREAM, 0);
+    
+    memset(&addr, 0,sizeof(addr));
     addr.sin6_family = AF_INET6;
     addr.sin6_port = htons(port_num);
-    inet_pton(AF_INET6, server_ip_str, &addr.sin6_addr);
-    connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
+
+    printf("please enter network interface name: \n");
+    scanf("%s", via_netif);
+    addr.sin6_scope_id = if_nametoindex(via_netif);
+
+    while (inet_pton(AF_INET6, server_ip_str, &addr.sin6_addr) <= 0)
+    {
+        printf("wrong remote ip format\n");
+        memset(server_ip_str, 0, sizeof(server_ip_str));
+        scanf("%s", server_ip_str);
+    }
+
+    if (connect(sockfd, (struct sockaddr *)&addr, sizeof(addr)) != 0)
+    {
+        printf("connect failed.\n");
+        printf("errno is :%d\n", errno);
+        return 0;
+    }
 
     
     char buffer[ BUF_SIZE ];
